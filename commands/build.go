@@ -321,7 +321,7 @@ func runBuild(ctx context.Context, dockerCli command.Cli, options buildOptions) 
 		return err
 	}
 	var printer *progress.Printer
-	printer, err = progress.NewPrinter(ctx2, os.Stderr, progressMode,
+	printer, err = progress.NewPrinter(ctx2, dockerCli.Out(), progressMode,
 		progress.WithDesc(
 			fmt.Sprintf("building with %q instance using %s driver", b.Name, b.Driver),
 			fmt.Sprintf("%s:%s", b.Driver, b.Name),

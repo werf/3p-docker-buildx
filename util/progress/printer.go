@@ -2,10 +2,10 @@ package progress
 
 import (
 	"context"
+	"io"
 	"os"
 	"sync"
 
-	"github.com/containerd/console"
 	"github.com/docker/buildx/util/confutil"
 	"github.com/docker/buildx/util/logutil"
 	"github.com/moby/buildkit/client"
@@ -87,7 +87,7 @@ func (p *Printer) ClearLogSource(v interface{}) {
 	}
 }
 
-func NewPrinter(ctx context.Context, out console.File, mode progressui.DisplayMode, opts ...PrinterOpt) (*Printer, error) {
+func NewPrinter(ctx context.Context, out io.Writer, mode progressui.DisplayMode, opts ...PrinterOpt) (*Printer, error) {
 	opt := &printerOpts{}
 	for _, o := range opts {
 		o(opt)
