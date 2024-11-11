@@ -308,10 +308,13 @@ func runBuild(ctx context.Context, dockerCli command.Cli, options buildOptions) 
 		return err
 	}
 
-	var term bool
-	if _, err := console.ConsoleFromFile(os.Stderr); err == nil {
+	//var term bool
+	/*if _, err := console.ConsoleFromFile(os.Stderr); err == nil {
 		term = true
-	}
+	}*/
+
+	term := dockerCli.Out().IsTerminal()
+
 	attributes := buildMetricAttributes(dockerCli, b, &options)
 
 	ctx2, cancel := context.WithCancel(context.TODO())
@@ -320,6 +323,7 @@ func runBuild(ctx context.Context, dockerCli command.Cli, options buildOptions) 
 	if err != nil {
 		return err
 	}
+
 	var printer *progress.Printer
 	printer, err = progress.NewPrinter(ctx2, dockerCli.Out(), progressMode,
 		progress.WithDesc(
@@ -328,7 +332,7 @@ func runBuild(ctx context.Context, dockerCli command.Cli, options buildOptions) 
 		),
 		progress.WithMetrics(mp, attributes),
 		progress.WithOnClose(func() {
-			printWarnings(os.Stderr, printer.Warnings(), progressMode)
+			printWarnings(dockerCli.Err(), printer.Warnings(), progressMode)
 		}),
 	)
 	if err != nil {
@@ -359,7 +363,7 @@ func runBuild(ctx context.Context, dockerCli command.Cli, options buildOptions) 
 	case progressui.QuietMode:
 		fmt.Println(getImageID(resp.ExporterResponse))
 	default:
-		desktop.PrintBuildDetails(os.Stderr, printer.BuildRefs(), term)
+		desktop.PrintBuildDetails(dockerCli.Out(), printer.BuildRefs(), term)
 	}
 	if options.imageIDFile != "" {
 		if err := os.WriteFile(options.imageIDFile, []byte(getImageID(resp.ExporterResponse)), 0644); err != nil {
